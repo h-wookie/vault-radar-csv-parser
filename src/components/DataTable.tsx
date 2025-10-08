@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Search, Download, ArrowUpDown, ArrowUp, ArrowDown,
+  Search, ArrowUpDown, ArrowUp, ArrowDown,
   ExternalLink, Calendar, User, Hash, Tag
 } from 'lucide-react';
-import { exportToCSV } from '@/utils/csvParser';
 import { Card } from '@/components/ui/card';
+import { SeverityChart } from '@/components/SeverityChart';
 
 interface DataTableProps {
   data: CSVData;
@@ -100,8 +100,15 @@ export const DataTable = ({ data }: DataTableProps) => {
     return 'secondary';
   };
 
+  const severityColumn = getSeverityColumn();
+
   return (
     <div className="space-y-6">
+      {/* Severity Chart */}
+      {severityColumn && (
+        <SeverityChart data={filteredAndSortedData} severityColumn={severityColumn} />
+      )}
+
       {/* Filters */}
       <Card className="p-6">
         <div className="flex flex-col lg:flex-row gap-4">
@@ -138,15 +145,6 @@ export const DataTable = ({ data }: DataTableProps) => {
               ))}
             </SelectContent>
           </Select>
-
-          <Button
-            onClick={() => exportToCSV(filteredAndSortedData, 'filtered-data.csv')}
-            variant="outline"
-            className="gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
         </div>
 
         <div className="mt-4 text-sm text-muted-foreground">

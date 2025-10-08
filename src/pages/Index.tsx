@@ -24,10 +24,10 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  CSV Data Analyzer
+                  Vault Radar CSV Data Analyzer
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Parse and analyze your CSV data
+                  Analyze CSV data with visual insights
                 </p>
               </div>
             </div>
@@ -48,11 +48,11 @@ const Index = () => {
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-8">
             <div className="text-center max-w-2xl">
               <h2 className="text-3xl font-bold mb-4">
-                Welcome to CSV Data Analyzer
+                Welcome to Vault Radar CSV Data Analyzer
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Upload your CSV file to get started. The app will parse and display your data
-                in an interactive, searchable table with filtering and sorting capabilities.
+                Upload your CSV file to get started. View your data with interactive charts,
+                searchable tables, and advanced filtering capabilities.
               </p>
             </div>
             
@@ -82,11 +82,11 @@ const Index = () => {
 
               <div className="text-center p-6 rounded-lg bg-card border">
                 <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Download className="w-6 h-6 text-success" />
+                  <Database className="w-6 h-6 text-success" />
                 </div>
-                <h3 className="font-semibold mb-2">Export Data</h3>
+                <h3 className="font-semibold mb-2">Visual Insights</h3>
                 <p className="text-sm text-muted-foreground">
-                  Download filtered results as CSV
+                  Interactive charts for severity distribution
                 </p>
               </div>
             </div>
@@ -102,6 +102,6 @@ const Index = () => {
 };
 
 // Missing imports for feature icons
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
 export default Index;
