@@ -9,6 +9,20 @@ export const exportToPDF = (data: CSVData) => {
   const pageHeight = doc.internal.pageSize.getHeight();
   let yPosition = 20;
 
+  // Helper function to add page numbers
+  const addPageNumber = (pageNum: number, totalPages: number) => {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(
+      `Page ${pageNum} of ${totalPages}`,
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: 'center' }
+    );
+    doc.setTextColor(0, 0, 0);
+  };
+
   // Helper function to add new page
   const addNewPage = () => {
     doc.addPage();
@@ -124,7 +138,7 @@ export const exportToPDF = (data: CSVData) => {
         3: { cellWidth: 45 },
         4: { cellWidth: 30 },
       },
-      margin: { left: 14, right: 14 },
+      margin: { left: 14, right: 14, bottom: 20 },
     });
   }
 
@@ -197,6 +211,13 @@ export const exportToPDF = (data: CSVData) => {
       yPosition += valueLines.length * 3.5 + 5;
     });
   });
+
+  // Add page numbers to all pages
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    addPageNumber(i, totalPages);
+  }
 
   // Save the PDF
   doc.save(`vault-radar-report-${new Date().toISOString().split('T')[0]}.pdf`);
