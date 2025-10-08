@@ -293,19 +293,14 @@ export const DataTable = ({ data }: DataTableProps) => {
 
                 return (
                   <div key={column} className="border-b pb-3 last:border-b-0">
-                    <dt className="text-sm font-semibold text-foreground mb-1 flex items-center gap-2">
+                    <dt className="text-sm font-semibold text-foreground mb-1">
                       {displayName}
-                      {description && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3 h-3 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            <p className="text-xs">{description}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
                     </dt>
+                    {description && (
+                      <p className="text-xs text-muted-foreground mb-2 italic">
+                        {description}
+                      </p>
+                    )}
                     <dd className="text-sm">
                       {columnLower.includes('severity') ? (
                         <Badge variant={getSeverityColor(value) as any}>{value}</Badge>
@@ -316,10 +311,10 @@ export const DataTable = ({ data }: DataTableProps) => {
                           href={value} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline flex items-center gap-1"
+                          className="text-primary hover:underline flex items-center gap-1 break-all"
                         >
                           {value}
-                          <ExternalLink className="w-3 h-3" />
+                          <ExternalLink className="w-3 h-3 flex-shrink-0" />
                         </a>
                       ) : (
                         <p className="break-words">{value}</p>
