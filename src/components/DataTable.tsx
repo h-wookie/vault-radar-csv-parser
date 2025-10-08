@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Search, ArrowUpDown, ArrowUp, ArrowDown,
-  ExternalLink, Calendar, User, Hash, Tag, Info, FileDown
+  ExternalLink, Calendar, User, Hash, Tag, Info, FileDown, ChevronDown
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SeverityChart } from '@/components/SeverityChart';
@@ -21,6 +22,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { getFieldDisplayName, getFieldDescription } from '@/utils/fieldDefinitions';
 import { exportToPDF } from '@/utils/pdfExport';
 
@@ -33,8 +39,8 @@ type SortDirection = 'asc' | 'desc' | null;
 
 export const DataTable = ({ data }: DataTableProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [severityFilter, setSeverityFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [severityFilter, setSeverityFilter] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [selectedRecord, setSelectedRecord] = useState<CSVRecord | null>(null);
@@ -81,8 +87,10 @@ export const DataTable = ({ data }: DataTableProps) => {
           value && value.toLowerCase().includes(searchQuery.toLowerCase())
         );
       
-      const matchesSeverity = severityFilter === 'all' || (sevCol && record[sevCol] === severityFilter);
-      const matchesCategory = categoryFilter === 'all' || (catCol && record[catCol] === categoryFilter);
+      const matchesSeverity = severityFilter.length === 0 || 
+        (sevCol && severityFilter.includes(record[sevCol]));
+      const matchesCategory = categoryFilter.length === 0 || 
+        (catCol && categoryFilter.includes(record[catCol]));
 
       return matchesSearch && matchesSeverity && matchesCategory;
     });
@@ -148,29 +156,97 @@ export const DataTable = ({ data }: DataTableProps) => {
             />
           </div>
           
-          <Select value={severityFilter} onValueChange={setSeverityFilter}>
-            <SelectTrigger className="w-full lg:w-[200px]">
-              <SelectValue placeholder="Filter by Severity" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Severities</SelectItem>
-              {uniqueSeverities.map(sev => (
-                <SelectItem key={sev} value={sev}>{sev}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full lg:w-[200px] justify-between">
+                {severityFilter.length > 0 
+                  ? `${severityFilter.length} selected` 
+                  : 'Filter by Severity'}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-3">
+              <div className="space-y-2">
+                {uniqueSeverities.map(sev => (
+                  <div key={sev} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`severity-${sev}`}
+                      checked={severityFilter.includes(sev)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSeverityFilter([...severityFilter, sev]);
+                        } else {
+                          setSeverityFilter(severityFilter.filter(s => s !== sev));
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`severity-${sev}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {sev}
+                    </label>
+                  </div>
+                ))}
+                {severityFilter.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => setSeverityFilter([])}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
 
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full lg:w-[200px]">
-              <SelectValue placeholder="Filter by Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {uniqueCategories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full lg:w-[200px] justify-between">
+                {categoryFilter.length > 0 
+                  ? `${categoryFilter.length} selected` 
+                  : 'Filter by Category'}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-3">
+              <div className="space-y-2">
+                {uniqueCategories.map(cat => (
+                  <div key={cat} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`category-${cat}`}
+                      checked={categoryFilter.includes(cat)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setCategoryFilter([...categoryFilter, cat]);
+                        } else {
+                          setCategoryFilter(categoryFilter.filter(c => c !== cat));
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={`category-${cat}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {cat}
+                    </label>
+                  </div>
+                ))}
+                {categoryFilter.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => setCategoryFilter([])}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <Button
             onClick={() => exportToPDF(filteredAndSortedData)}
