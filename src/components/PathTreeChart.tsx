@@ -14,13 +14,15 @@ interface TreeNode {
   fill?: string;
 }
 
+// Colorblind-friendly color palette (based on Paul Tol's palette)
 const COLORS = [
-  'hsl(var(--primary))',
-  'hsl(var(--accent))',
-  'hsl(var(--success))',
-  'hsl(var(--warning))',
-  'hsl(var(--destructive))',
-  'hsl(var(--secondary))',
+  '#4477AA', // Blue
+  '#EE6677', // Red
+  '#228833', // Green
+  '#CCBB44', // Yellow
+  '#66CCEE', // Cyan
+  '#AA3377', // Purple
+  '#BBBBBB', // Grey
 ];
 
 export const PathTreeChart = ({ data }: PathTreeChartProps) => {
@@ -91,7 +93,9 @@ export const PathTreeChart = ({ data }: PathTreeChartProps) => {
   const CustomContent = (props: any) => {
     const { x, y, width, height, name, size, fill } = props;
     
-    if (!name || width < 40 || height < 30) return null;
+    if (!name || width < 50 || height < 35) return null;
+
+    const showText = width > 80 && height > 50;
 
     return (
       <g>
@@ -102,30 +106,38 @@ export const PathTreeChart = ({ data }: PathTreeChartProps) => {
           height={height}
           style={{
             fill,
-            stroke: 'hsl(var(--background))',
+            stroke: 'hsl(var(--border))',
             strokeWidth: 2,
-            opacity: 0.9,
+            opacity: 0.85,
           }}
         />
-        {width > 60 && height > 40 && (
+        {showText && (
           <>
+            <rect
+              x={x + 4}
+              y={y + height / 2 - 18}
+              width={width - 8}
+              height={36}
+              fill="rgba(0, 0, 0, 0.6)"
+              rx={4}
+            />
             <text
               x={x + width / 2}
-              y={y + height / 2 - 8}
+              y={y + height / 2 - 4}
               textAnchor="middle"
-              fill="hsl(var(--background))"
-              fontSize={12}
-              fontWeight="bold"
+              fill="#ffffff"
+              fontSize={11}
+              fontWeight="600"
             >
-              {name.length > 20 ? name.substring(0, 20) + '...' : name}
+              {name.length > 15 ? name.substring(0, 15) + '...' : name}
             </text>
             {size && (
               <text
                 x={x + width / 2}
-                y={y + height / 2 + 10}
+                y={y + height / 2 + 11}
                 textAnchor="middle"
-                fill="hsl(var(--background))"
-                fontSize={11}
+                fill="#ffffff"
+                fontSize={10}
               >
                 {size} finding{size !== 1 ? 's' : ''}
               </text>

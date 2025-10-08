@@ -95,9 +95,10 @@ export const DataTable = ({ data }: DataTableProps) => {
 
   const getSeverityColor = (severity: string) => {
     const lower = severity.toLowerCase();
-    if (lower.includes('critical') || lower.includes('high')) return 'destructive';
-    if (lower.includes('medium')) return 'warning';
-    if (lower.includes('low')) return 'success';
+    if (lower.includes('critical')) return 'destructive';
+    if (lower.includes('high')) return 'warning'; 
+    if (lower.includes('medium')) return 'secondary';
+    if (lower.includes('low') || lower.includes('info')) return 'success';
     return 'secondary';
   };
 

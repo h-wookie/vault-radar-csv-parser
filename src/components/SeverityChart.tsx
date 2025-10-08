@@ -8,12 +8,13 @@ interface SeverityChartProps {
   severityColumn: string;
 }
 
+// Colorblind-friendly colors (Paul Tol's palette)
 const SEVERITY_COLORS: Record<string, string> = {
-  critical: 'hsl(var(--destructive))',
-  high: 'hsl(var(--destructive))',
-  medium: 'hsl(var(--warning))',
-  low: 'hsl(var(--success))',
-  info: 'hsl(var(--primary))',
+  critical: '#EE6677',  // Red
+  high: '#CCBB44',      // Yellow  
+  medium: '#4477AA',    // Blue
+  low: '#228833',       // Green
+  info: '#66CCEE',      // Cyan
 };
 
 export const SeverityChart = ({ data, severityColumn }: SeverityChartProps) => {
@@ -31,7 +32,7 @@ export const SeverityChart = ({ data, severityColumn }: SeverityChartProps) => {
     return Object.entries(counts).map(([name, value]) => ({
       name,
       value,
-      color: SEVERITY_COLORS[name.toLowerCase()] || 'hsl(var(--muted))',
+      color: SEVERITY_COLORS[name.toLowerCase()] || '#BBBBBB',
     }));
   }, [data, severityColumn]);
 

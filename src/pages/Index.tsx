@@ -4,6 +4,7 @@ import { DataTable } from '@/components/DataTable';
 import { CSVData } from '@/types/csvData';
 import { Database, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [csvData, setCsvData] = useState<CSVData | null>(null);
@@ -33,11 +34,15 @@ const Index = () => {
             </div>
             
             {csvData && (
-              <Button onClick={handleReset} variant="outline" className="gap-2">
-                <FileSpreadsheet className="w-4 h-4" />
-                Load New File
-              </Button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button onClick={handleReset} variant="outline" className="gap-2">
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Load New File
+                </Button>
+              </div>
             )}
+            {!csvData && <ThemeToggle />}
           </div>
         </div>
       </header>
