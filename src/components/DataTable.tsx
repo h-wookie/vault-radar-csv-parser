@@ -10,7 +10,12 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SeverityChart } from '@/components/SeverityChart';
-import { PathTreeChart } from '@/components/PathTreeChart';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface DataTableProps {
   data: CSVData;
@@ -25,11 +30,23 @@ export const DataTable = ({ data }: DataTableProps) => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [selectedRecord, setSelectedRecord] = useState<CSVRecord | null>(null);
 
   const columns = useMemo(() => 
     data.length > 0 ? Object.keys(data[0]) : [],
     [data]
   );
+
+  // Display columns in specific order
+  const displayColumns = useMemo(() => {
+    const categoryCol = columns.find(col => col.toLowerCase().includes('category')) || '';
+    const descriptionCol = columns.find(col => col.toLowerCase().includes('description')) || '';
+    const severityCol = columns.find(col => col.toLowerCase().includes('severity')) || '';
+    const pathCol = columns.find(col => col.toLowerCase().includes('path') && !col.toLowerCase().includes('location')) || '';
+    const createdCol = columns.find(col => col.toLowerCase().includes('created')) || '';
+
+    return [categoryCol, descriptionCol, severityCol, pathCol, createdCol].filter(Boolean);
+  }, [columns]);
 
   const getSeverityColumn = () => 
     columns.find(col => col.toLowerCase().includes('severity')) || '';
@@ -106,13 +123,10 @@ export const DataTable = ({ data }: DataTableProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {severityColumn && (
-          <SeverityChart data={filteredAndSortedData} severityColumn={severityColumn} />
-        )}
-        <PathTreeChart data={filteredAndSortedData} />
-      </div>
+      {/* Severity Chart */}
+      {severityColumn && (
+        <SeverityChart data={filteredAndSortedData} severityColumn={severityColumn} />
+      )}
 
       {/* Filters */}
       <Card className="p-6">
@@ -163,7 +177,7 @@ export const DataTable = ({ data }: DataTableProps) => {
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                {columns.map(column => (
+                {displayColumns.map(column => (
                   <th key={column} className="px-4 py-3 text-left">
                     <button
                       onClick={() => handleSort(column)}
@@ -177,8 +191,12 @@ export const DataTable = ({ data }: DataTableProps) => {
             </thead>
             <tbody className="divide-y divide-border">
               {filteredAndSortedData.map((record, index) => (
-                <tr key={index} className="hover:bg-muted/30 transition-colors">
-                  {columns.map(column => {
+                <tr 
+                  key={index} 
+                  className="hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => setSelectedRecord(record)}
+                >
+                  {displayColumns.map(column => {
                     const value = record[column] || '';
                     const columnLower = column.toLowerCase();
                     
@@ -201,55 +219,12 @@ export const DataTable = ({ data }: DataTableProps) => {
                       );
                     }
                     
-                    if ((columnLower.includes('link') || columnLower.includes('url')) && value) {
-                      return (
-                        <td key={column} className="px-4 py-3">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                            className="gap-2"
-                          >
-                            <a href={value} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </Button>
-                        </td>
-                      );
-                    }
-                    
                     if (columnLower.includes('date') || columnLower.includes('created') && value) {
                       return (
                         <td key={column} className="px-4 py-3">
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="w-3 h-3" />
                             {value}
-                          </div>
-                        </td>
-                      );
-                    }
-                    
-                    if (columnLower.includes('author') && value) {
-                      return (
-                        <td key={column} className="px-4 py-3">
-                          <div className="flex items-center gap-2 text-sm">
-                            <User className="w-3 h-3 text-muted-foreground" />
-                            {value}
-                          </div>
-                        </td>
-                      );
-                    }
-                    
-                    if (columnLower.includes('tag') && value) {
-                      return (
-                        <td key={column} className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1">
-                            {value.split(',').slice(0, 2).map((tag, i) => (
-                              <Badge key={i} variant="secondary" className="text-xs">
-                                <Tag className="w-3 h-3 mr-1" />
-                                {tag.trim()}
-                              </Badge>
-                            ))}
                           </div>
                         </td>
                       );
@@ -276,6 +251,52 @@ export const DataTable = ({ data }: DataTableProps) => {
           No records found matching your filters
         </div>
       )}
+
+      {/* Details Dialog */}
+      <Dialog open={!!selectedRecord} onOpenChange={() => setSelectedRecord(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Finding Details</DialogTitle>
+          </DialogHeader>
+          {selectedRecord && (
+            <div className="space-y-4">
+              {columns.map(column => {
+                const value = selectedRecord[column];
+                if (!value) return null;
+
+                const columnLower = column.toLowerCase();
+
+                return (
+                  <div key={column} className="border-b pb-3 last:border-b-0">
+                    <dt className="text-sm font-semibold text-muted-foreground mb-1">
+                      {column}
+                    </dt>
+                    <dd className="text-sm">
+                      {columnLower.includes('severity') ? (
+                        <Badge variant={getSeverityColor(value) as any}>{value}</Badge>
+                      ) : columnLower.includes('category') ? (
+                        <Badge variant="outline">{value}</Badge>
+                      ) : (columnLower.includes('link') || columnLower.includes('url')) ? (
+                        <a 
+                          href={value} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline flex items-center gap-1"
+                        >
+                          {value}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <p className="break-words">{value}</p>
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
