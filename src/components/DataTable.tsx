@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, ArrowUpDown, ArrowUp, ArrowDown,
-  ExternalLink, Calendar, User, Hash, Tag
+  ExternalLink, Calendar, User, Hash, Tag, Info
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SeverityChart } from '@/components/SeverityChart';
@@ -16,6 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { getFieldDisplayName, getFieldDescription } from '@/utils/fieldDefinitions';
 
 interface DataTableProps {
   data: CSVData;
@@ -177,16 +183,33 @@ export const DataTable = ({ data }: DataTableProps) => {
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                {displayColumns.map(column => (
-                  <th key={column} className="px-4 py-3 text-left">
-                    <button
-                      onClick={() => handleSort(column)}
-                      className="flex items-center gap-2 font-semibold text-sm hover:text-primary transition-colors"
-                    >
-                      {column} {getSortIcon(column)}
-                    </button>
-                  </th>
-                ))}
+                {displayColumns.map(column => {
+                  const description = getFieldDescription(column);
+                  const displayName = getFieldDisplayName(column);
+                  
+                  return (
+                    <th key={column} className="px-4 py-3 text-left">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleSort(column)}
+                          className="flex items-center gap-2 font-semibold text-sm hover:text-primary transition-colors"
+                        >
+                          {displayName} {getSortIcon(column)}
+                        </button>
+                        {description && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p>{description}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -265,11 +288,23 @@ export const DataTable = ({ data }: DataTableProps) => {
                 if (!value) return null;
 
                 const columnLower = column.toLowerCase();
+                const displayName = getFieldDisplayName(column);
+                const description = getFieldDescription(column);
 
                 return (
                   <div key={column} className="border-b pb-3 last:border-b-0">
-                    <dt className="text-sm font-semibold text-muted-foreground mb-1">
-                      {column}
+                    <dt className="text-sm font-semibold text-foreground mb-1 flex items-center gap-2">
+                      {displayName}
+                      {description && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-3 h-3 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="text-xs">{description}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                     </dt>
                     <dd className="text-sm">
                       {columnLower.includes('severity') ? (
