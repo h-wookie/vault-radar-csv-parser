@@ -8,33 +8,23 @@ export const parseCSV = (csvText: string): CSVData => {
   }
 
   // Parse header
-  const headers = parseCSVLine(lines[0]);
+  const headers = parseCSVLine(lines[0]).filter(h => h.trim() !== '');
   
-  // Validate headers match expected format
-  const expectedHeaders = [
-    "Field name", "Category", "Description", "CreatedAt", "Author", 
-    "Severity", "Is Historic", "Deep Link", "Value Hash", "Fingerprint",
-    "Textual Context", "Activeness", "Tags", "ManagedLocation",
-    "ManagedLocationIsLatest", "TotalManagedLocations", "GitReference",
-    "Version", "AWSAccountID"
-  ];
-
-  const missingHeaders = expectedHeaders.filter(h => !headers.includes(h));
-  if (missingHeaders.length > 0) {
-    console.warn('Missing expected headers:', missingHeaders);
+  if (headers.length === 0) {
+    throw new Error('CSV file has no valid headers');
   }
 
   // Parse data rows
   const records: CSVData = [];
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
-    if (values.length === 0) continue;
+    if (values.length === 0 || values.every(v => v.trim() === '')) continue;
 
-    const record: any = {};
+    const record: CSVRecord = {};
     headers.forEach((header, index) => {
       record[header] = values[index] || '';
     });
-    records.push(record as CSVRecord);
+    records.push(record);
   }
 
   return records;
@@ -77,7 +67,7 @@ export const exportToCSV = (data: CSVData, filename: string = 'export.csv') => {
     headers.join(','),
     ...data.map(row => 
       headers.map(header => {
-        const value = row[header as keyof CSVRecord];
+        const value = row[header] || '';
         // Escape values containing commas or quotes
         if (value.includes(',') || value.includes('"') || value.includes('\n')) {
           return `"${value.replace(/"/g, '""')}"`;
