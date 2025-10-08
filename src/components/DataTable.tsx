@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SeverityChart } from '@/components/SeverityChart';
+import { PathTreeChart } from '@/components/PathTreeChart';
 
 interface DataTableProps {
   data: CSVData;
@@ -104,10 +105,13 @@ export const DataTable = ({ data }: DataTableProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Severity Chart */}
-      {severityColumn && (
-        <SeverityChart data={filteredAndSortedData} severityColumn={severityColumn} />
-      )}
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {severityColumn && (
+          <SeverityChart data={filteredAndSortedData} severityColumn={severityColumn} />
+        )}
+        <PathTreeChart data={filteredAndSortedData} />
+      </div>
 
       {/* Filters */}
       <Card className="p-6">
