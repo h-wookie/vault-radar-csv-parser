@@ -91,7 +91,7 @@ export const PathTreeChart = ({ data }: PathTreeChartProps) => {
   const CustomContent = (props: any) => {
     const { x, y, width, height, name, size, fill } = props;
     
-    if (width < 40 || height < 30) return null;
+    if (!name || width < 40 || height < 30) return null;
 
     return (
       <g>
