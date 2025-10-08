@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, ArrowUpDown, ArrowUp, ArrowDown,
-  ExternalLink, Calendar, User, Hash, Tag, Info
+  ExternalLink, Calendar, User, Hash, Tag, Info, FileDown
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SeverityChart } from '@/components/SeverityChart';
@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { getFieldDisplayName, getFieldDescription } from '@/utils/fieldDefinitions';
+import { exportToPDF } from '@/utils/pdfExport';
 
 interface DataTableProps {
   data: CSVData;
@@ -170,6 +171,15 @@ export const DataTable = ({ data }: DataTableProps) => {
               ))}
             </SelectContent>
           </Select>
+
+          <Button
+            onClick={() => exportToPDF(filteredAndSortedData)}
+            variant="default"
+            className="gap-2"
+          >
+            <FileDown className="w-4 h-4" />
+            Export PDF
+          </Button>
         </div>
 
         <div className="mt-4 text-sm text-muted-foreground">
