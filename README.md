@@ -23,6 +23,8 @@ The software is provided “as is,” without warranty of any kind, express or i
 
 ---
 
+![Screenshot of finding](./screenshot.png?raw=true "Dark mode findings")
+
 ## Getting Started
 
 ### Prerequisites
