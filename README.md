@@ -1,6 +1,7 @@
 # Vault-Radar CSV Parser
 
 [![Open Source](https://img.shields.io/badge/open%20source-yes-brightgreen)](https://github.com/Atnaszurc/vault-radar-csv-parser)
+[![SBOM](https://img.shields.io/badge/SBOM-CycloneDX-blue)](./sbom/sbom.json)
 
 Vault-Radar CSV Parser is an offline, open-source tool designed to analyze Vault-Radar export files.
 It allows you to filter, inspect, and export secret data directly from CSV files, even when the SaaS solution is unavailable.
@@ -13,6 +14,13 @@ Key features include:
 * Built with React, Vite, and TailwindCSS for fast and modern UI
 * Open-source and free to modify
 
+
+## Disclaimer
+
+This project is a personal, community-driven tool and is not an official HashiCorp product.
+It is not affiliated with, endorsed by, or supported by HashiCorp.
+The software is provided “as is,” without warranty of any kind, express or implied. Use at your own risk.
+
 ---
 
 ## Getting Started
@@ -21,13 +29,14 @@ Key features include:
 
 To run locally with npm:
 
-* Node.js ≥ 18
-* npm ≥ 9
+* Node.js ≥ 22
+* npm ≥ 11.6
 
 To run with Docker:
 
 * Docker ≥ 20
 
+SBOM: The full Software Bill of Materials (SBOM) is available in the /sbom
 ---
 
 ### Run locally (development)
