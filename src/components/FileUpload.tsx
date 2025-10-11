@@ -49,20 +49,6 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           // Once all files are processed, load the combined data
           if (processedCount === files.length) {
             onDataLoaded(allData);
-            
-            if (files.length > 1) {
-              toast({
-                title: 'Success!',
-                description: `Loaded ${allData.length} records from ${files.length} files`,
-              });
-            } else {
-              toast({
-                title: 'Success!',
-                description: hasExistingData 
-                  ? `Added ${allData.length} new records to existing data`
-                  : `Loaded ${allData.length} records`,
-              });
-            }
           }
         } catch (error) {
           toast({

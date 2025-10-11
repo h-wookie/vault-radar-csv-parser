@@ -73,17 +73,35 @@ const Index = () => {
               .filter(Boolean)
           );
 
-          // Filter out duplicates from new data using its own fingerprint column
-          const uniqueNewData = newData.filter(record => {
-            const fingerprint = (record[newFpCol] || '').toLowerCase();
-            return fingerprint && !existingFingerprints.has(fingerprint);
-          });
+          // Dedupe against existing data AND within the newly uploaded set
+          const seenNew = new Set<string>();
+          const uniqueNewData: typeof newData = [];
+          let duplicatesVsExisting = 0;
+          let duplicatesWithinUploads = 0;
 
-          const duplicateCount = newData.length - uniqueNewData.length;
+          for (const record of newData) {
+            const fingerprint = (record[newFpCol] || '').toLowerCase();
+            if (!fingerprint) continue;
+            if (existingFingerprints.has(fingerprint)) {
+              duplicatesVsExisting++;
+              continue;
+            }
+            if (seenNew.has(fingerprint)) {
+              duplicatesWithinUploads++;
+              continue;
+            }
+            seenNew.add(fingerprint);
+            uniqueNewData.push(record);
+          }
+
+          const duplicateCount = duplicatesVsExisting + duplicatesWithinUploads;
 
           toast({
             title: 'Upload complete',
-            description: `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates`,
+            description:
+              duplicatesWithinUploads > 0
+                ? `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates (${duplicatesWithinUploads} within uploads)`
+                : `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates`,
           });
 
           return uniqueNewData.length > 0 ? [...prevData, ...uniqueNewData] : prevData;
@@ -152,13 +170,6 @@ const Index = () => {
           if (processedCount === files.length) {
             handleDataLoaded(allData);
             setIsMenuOpen(false);
-            
-            if (files.length > 1) {
-              toast({
-                title: 'Multiple Files Uploaded',
-                description: `Successfully processed ${files.length} CSV files`,
-              });
-            }
           }
         } catch (error) {
           toast({
