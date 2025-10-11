@@ -177,7 +177,19 @@ const Index = () => {
               </div>
             </div>
             
-            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <div className="flex items-center gap-2">
+              {csvData && (
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Upload More Data"
+                >
+                  <Upload className="w-5 h-5" />
+                </Button>
+              )}
+              
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="w-5 h-5" />
@@ -362,6 +374,7 @@ const Index = () => {
                 </div>
               </SheetContent>
             </Sheet>
+            </div>
           </div>
         </div>
       </header>
