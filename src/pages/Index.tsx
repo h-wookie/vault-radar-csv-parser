@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { CSVData } from '@/types/csvData';
-import { Database, FileSpreadsheet, Trash2 } from 'lucide-react';
+import { Database, FileSpreadsheet, Trash2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import {
@@ -17,12 +17,14 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { parseCSV } from '@/utils/csvParser';
 
 const STORAGE_KEY = 'vault-radar-csv-data';
 
 const Index = () => {
   const [csvData, setCsvData] = useState<CSVData | null>(null);
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -63,6 +65,50 @@ const Index = () => {
     });
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.csv')) {
+      toast({
+        title: 'Invalid File',
+        description: 'Please upload a CSV file',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const data = parseCSV(text);
+        
+        if (data.length === 0) {
+          throw new Error('No data found in CSV');
+        }
+
+        handleDataLoaded(data);
+        toast({
+          title: 'Success!',
+          description: `Added ${data.length} new records`,
+        });
+      } catch (error) {
+        toast({
+          title: 'Parse Error',
+          description: error instanceof Error ? error.message : 'Failed to parse CSV',
+          variant: 'destructive',
+        });
+      }
+    };
+    reader.readAsText(file);
+    
+    // Reset input so same file can be uploaded again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
@@ -87,6 +133,22 @@ const Index = () => {
             {csvData && (
               <div className="flex items-center gap-2">
                 <ThemeToggle />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="header-file-upload"
+                />
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload More
+                </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="gap-2">
