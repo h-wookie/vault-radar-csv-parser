@@ -84,6 +84,16 @@ export const DataTable = ({ data }: DataTableProps) => {
     return catCol ? Array.from(new Set(data.map(r => r[catCol]).filter(Boolean))) : [];
   }, [data, columns]);
 
+  const getSeverityOrder = (severity: string) => {
+    const lower = severity.toLowerCase();
+    if (lower.includes('critical')) return 0;
+    if (lower.includes('high')) return 1;
+    if (lower.includes('medium')) return 2;
+    if (lower.includes('low')) return 3;
+    if (lower.includes('info')) return 4;
+    return 5;
+  };
+
   const filteredAndSortedData = useMemo(() => {
     const sevCol = getSeverityColumn();
     const catCol = getCategoryColumn();
@@ -148,16 +158,6 @@ export const DataTable = ({ data }: DataTableProps) => {
     if (lower.includes('medium')) return 'secondary';
     if (lower.includes('low') || lower.includes('info')) return 'success';
     return 'secondary';
-  };
-
-  const getSeverityOrder = (severity: string) => {
-    const lower = severity.toLowerCase();
-    if (lower.includes('critical')) return 0;
-    if (lower.includes('high')) return 1;
-    if (lower.includes('medium')) return 2;
-    if (lower.includes('low')) return 3;
-    if (lower.includes('info')) return 4;
-    return 5;
   };
 
   const severityColumn = getSeverityColumn();
