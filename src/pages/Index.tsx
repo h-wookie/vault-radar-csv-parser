@@ -2,9 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { CSVData } from '@/types/csvData';
-import { Database, FileSpreadsheet, Trash2, Upload } from 'lucide-react';
+import { Database, FileSpreadsheet, Trash2, Upload, Menu, Github, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,11 +25,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { parseCSV } from '@/utils/csvParser';
+import { Separator } from '@/components/ui/separator';
 
 const STORAGE_KEY = 'vault-radar-csv-data';
 
 const Index = () => {
   const [csvData, setCsvData] = useState<CSVData | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -154,51 +163,119 @@ const Index = () => {
               </div>
             </div>
             
-            {csvData && (
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="header-file-upload"
-                />
-                <Button 
-                  variant="outline" 
-                  className="gap-2"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload More
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="w-5 h-5" />
                 </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="gap-2">
-                      <Trash2 className="w-4 h-4" />
-                      Clear Storage
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                
+                <div className="flex flex-col gap-4 mt-6">
+                  {/* Theme Toggle */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Theme</span>
+                    <ThemeToggle />
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Upload More Button */}
+                  {csvData && (
+                    <>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".csv"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="header-file-upload"
+                      />
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start gap-2"
+                        onClick={() => {
+                          fileInputRef.current?.click();
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Upload className="w-4 h-4" />
+                        Upload More Data
+                      </Button>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" className="w-full justify-start gap-2">
+                            <Trash2 className="w-4 h-4" />
+                            Clear Storage
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete all uploaded CSV data from storage. 
+                              This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => {
+                              handleClearStorage();
+                              setIsMenuOpen(false);
+                            }}>
+                              Clear Data
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      
+                      <Separator />
+                    </>
+                  )}
+                  
+                  {/* External Links */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">Resources</p>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-2"
+                      asChild
+                    >
+                      <a 
+                        href="https://github.com/fwarfvinge/vault-radar-csv" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <Github className="w-4 h-4" />
+                        GitHub Repository
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete all uploaded CSV data from storage. 
-                        This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleClearStorage}>
-                        Clear Data
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            )}
-            {!csvData && <ThemeToggle />}
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-2"
+                      asChild
+                    >
+                      <a 
+                        href="https://hub.docker.com/r/fwarfvinge/vault-radar-csv" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <Database className="w-4 h-4" />
+                        Docker Hub
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
