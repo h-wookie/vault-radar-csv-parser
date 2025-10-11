@@ -7,9 +7,10 @@ import { CSVData } from '@/types/csvData';
 
 interface FileUploadProps {
   onDataLoaded: (data: CSVData) => void;
+  hasExistingData?: boolean;
 }
 
-export const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
+export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
 
@@ -36,7 +37,9 @@ export const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
         onDataLoaded(data);
         toast({
           title: 'Success!',
-          description: `Loaded ${data.length} records`,
+          description: hasExistingData 
+            ? `Added ${data.length} new records to existing data`
+            : `Loaded ${data.length} records`,
         });
       } catch (error) {
         toast({
@@ -108,10 +111,12 @@ export const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
           
           <div>
             <p className="text-lg font-semibold text-foreground mb-2">
-              {isDragging ? 'Drop your CSV file here' : 'Upload CSV File'}
+              {isDragging ? 'Drop your CSV file here' : hasExistingData ? 'Add More Data' : 'Upload CSV File'}
             </p>
             <p className="text-sm text-muted-foreground">
-              Drag and drop or click to browse
+              {hasExistingData 
+                ? 'New data will be added to existing records'
+                : 'Drag and drop or click to browse'}
             </p>
           </div>
 

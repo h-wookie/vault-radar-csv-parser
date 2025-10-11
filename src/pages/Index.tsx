@@ -1,17 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { CSVData } from '@/types/csvData';
-import { Database, FileSpreadsheet } from 'lucide-react';
+import { Database, FileSpreadsheet, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+
+const STORAGE_KEY = 'vault-radar-csv-data';
 
 const Index = () => {
   const [csvData, setCsvData] = useState<CSVData | null>(null);
+  const { toast } = useToast();
 
-  const handleReset = () => {
-    setCsvData(null);
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsedData = JSON.parse(stored);
+        setCsvData(parsedData);
+      } catch (error) {
+        console.error('Failed to load data from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Save to localStorage whenever csvData changes
+  useEffect(() => {
+    if (csvData) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(csvData));
+    }
+  }, [csvData]);
+
+  const handleDataLoaded = (newData: CSVData) => {
+    setCsvData(prevData => {
+      if (prevData) {
+        // Append new data to existing data
+        return [...prevData, ...newData];
+      }
+      return newData;
+    });
   };
+
+  const handleClearStorage = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCsvData(null);
+    toast({
+      title: 'Storage Cleared',
+      description: 'All CSV data has been removed',
+    });
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
@@ -36,10 +87,29 @@ const Index = () => {
             {csvData && (
               <div className="flex items-center gap-2">
                 <ThemeToggle />
-                <Button onClick={handleReset} variant="outline" className="gap-2">
-                  <FileSpreadsheet className="w-4 h-4" />
-                  Load New File
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="gap-2">
+                      <Trash2 className="w-4 h-4" />
+                      Clear Storage
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete all uploaded CSV data from storage. 
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleClearStorage}>
+                        Clear Data
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )}
             {!csvData && <ThemeToggle />}
@@ -61,7 +131,7 @@ const Index = () => {
               </p>
             </div>
             
-            <FileUpload onDataLoaded={setCsvData} />
+            <FileUpload onDataLoaded={handleDataLoaded} hasExistingData={!!csvData} />
 
             {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl">
