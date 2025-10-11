@@ -247,7 +247,7 @@ const Index = () => {
                       asChild
                     >
                       <a 
-                        href="https://github.com/fwarfvinge/vault-radar-csv" 
+                        href="https://github.com/Atnaszurc/vault-radar-csv-parser" 
                         target="_blank" 
                         rel="noopener noreferrer"
                       >
