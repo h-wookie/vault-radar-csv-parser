@@ -48,9 +48,37 @@ const Index = () => {
 
   const handleDataLoaded = (newData: CSVData) => {
     setCsvData(prevData => {
-      if (prevData) {
-        // Append new data to existing data
-        return [...prevData, ...newData];
+      if (prevData && prevData.length > 0) {
+        // Get existing fingerprints
+        const fingerprintCol = Object.keys(prevData[0]).find(col => 
+          col.toLowerCase().includes('fingerprint')
+        );
+        
+        if (!fingerprintCol) {
+          // If no fingerprint column, just append
+          return [...prevData, ...newData];
+        }
+        
+        const existingFingerprints = new Set(
+          prevData.map(record => record[fingerprintCol]).filter(Boolean)
+        );
+        
+        // Filter out duplicates from new data
+        const uniqueNewData = newData.filter(record => {
+          const fingerprint = record[fingerprintCol];
+          return fingerprint && !existingFingerprints.has(fingerprint);
+        });
+        
+        const duplicateCount = newData.length - uniqueNewData.length;
+        
+        if (duplicateCount > 0) {
+          toast({
+            title: 'Duplicates Removed',
+            description: `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates`,
+          });
+        }
+        
+        return [...prevData, ...uniqueNewData];
       }
       return newData;
     });
@@ -89,10 +117,6 @@ const Index = () => {
         }
 
         handleDataLoaded(data);
-        toast({
-          title: 'Success!',
-          description: `Added ${data.length} new records`,
-        });
       } catch (error) {
         toast({
           title: 'Parse Error',
