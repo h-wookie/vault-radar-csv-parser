@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { CSVData } from '@/types/csvData';
-import { Database, FileSpreadsheet, Trash2, Upload, Menu, Github, ExternalLink } from 'lucide-react';
+import { Database, FileSpreadsheet, Trash2, Upload, Menu, Github, ExternalLink, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import {
@@ -240,6 +240,57 @@ const Index = () => {
                   {/* External Links */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-muted-foreground">Resources</p>
+                    
+                    {/* Vault Radar Documentation */}
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-2"
+                      asChild
+                    >
+                      <a 
+                        href="https://developer.hashicorp.com/hcp/docs/vault-radar" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        What is Vault Radar?
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-2"
+                      asChild
+                    >
+                      <a 
+                        href="https://developer.hashicorp.com/hcp/docs/vault-radar/cli" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        Vault Radar CLI
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-2"
+                      asChild
+                    >
+                      <a 
+                        href="https://developer.hashicorp.com/hcp/docs/vault-radar/cli/scan/repo" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        Vault Radar Scan
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    </Button>
+                    
+                    <Separator className="my-2" />
                     
                     <Button 
                       variant="outline" 
