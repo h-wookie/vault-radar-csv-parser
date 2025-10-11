@@ -39,6 +39,8 @@ To run with Docker:
 * Docker ≥ 20
 
 SBOM: The full Software Bill of Materials (SBOM) is available in the /sbom
+Script to generate SBOM exists in [generate_sbom.py](./generate_sbom.py)
+
 ---
 
 ### Run locally (development)
