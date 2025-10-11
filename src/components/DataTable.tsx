@@ -50,7 +50,7 @@ export const DataTable = ({ data }: DataTableProps) => {
   );
   
   const [sortField, setSortField] = useState<SortField>(defaultSeverityColumn);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSeverityColumn ? 'desc' : null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSeverityColumn ? 'asc' : null);
 
   const columns = useMemo(() => 
     data.length > 0 ? Object.keys(data[0]) : [],
