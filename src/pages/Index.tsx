@@ -325,8 +325,18 @@ const Index = () => {
                     </Button>
                   </div>
                   
+                  {/* Disclaimer */}
+                  <div className="mt-6 pt-4 border-t">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      <strong>Disclaimer:</strong> This project is a personal, community-driven tool and is not an official HashiCorp product. 
+                      It is not affiliated with, endorsed by, or supported by HashiCorp. 
+                      The software is provided "as is," without warranty of any kind, express or implied. 
+                      Use at your own risk.
+                    </p>
+                  </div>
+                  
                   {/* Made with Lovable */}
-                  <div className="mt-auto pt-6 border-t">
+                  <div className="mt-4 pt-4 border-t">
                     <a 
                       href="https://lovable.dev" 
                       target="_blank" 
