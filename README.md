@@ -63,6 +63,14 @@ Your app will be available at [http://localhost:8080](http://localhost:8080) by 
 
 ### Run with Docker
 
+#### Pull the pre-built image
+
+```bash
+docker run -p 8080:8080 fwarfvinge/vault-radar-csv:latest
+```
+
+#### Build the image locally
+
 ```bash
 # Build the Docker image
 docker build -t vault-radar-csv .
