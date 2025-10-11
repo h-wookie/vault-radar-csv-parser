@@ -14,50 +14,76 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
   const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
 
-  const handleFile = useCallback((file: File) => {
-    if (!file.name.endsWith('.csv')) {
+  const handleFile = useCallback((files: FileList) => {
+    // Validate all files are CSV
+    const fileArray = Array.from(files);
+    const nonCsvFiles = fileArray.filter(file => !file.name.endsWith('.csv'));
+    
+    if (nonCsvFiles.length > 0) {
       toast({
-        title: 'Invalid File',
-        description: 'Please upload a CSV file',
+        title: 'Invalid File(s)',
+        description: `Please upload only CSV files. Found: ${nonCsvFiles.map(f => f.name).join(', ')}`,
         variant: 'destructive',
       });
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        const data = parseCSV(text);
-        
-        if (data.length === 0) {
-          throw new Error('No data found in CSV');
-        }
+    // Process all files
+    let processedCount = 0;
+    let allData: CSVData = [];
 
-        onDataLoaded(data);
-        toast({
-          title: 'Success!',
-          description: hasExistingData 
-            ? `Added ${data.length} new records to existing data`
-            : `Loaded ${data.length} records`,
-        });
-      } catch (error) {
-        toast({
-          title: 'Parse Error',
-          description: error instanceof Error ? error.message : 'Failed to parse CSV',
-          variant: 'destructive',
-        });
-      }
-    };
-    reader.readAsText(file);
-  }, [onDataLoaded, toast]);
+    fileArray.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const text = e.target?.result as string;
+          const data = parseCSV(text);
+          
+          if (data.length === 0) {
+            throw new Error(`No data found in ${file.name}`);
+          }
+
+          allData = [...allData, ...data];
+          processedCount++;
+
+          // Once all files are processed, load the combined data
+          if (processedCount === files.length) {
+            onDataLoaded(allData);
+            
+            if (files.length > 1) {
+              toast({
+                title: 'Success!',
+                description: `Loaded ${allData.length} records from ${files.length} files`,
+              });
+            } else {
+              toast({
+                title: 'Success!',
+                description: hasExistingData 
+                  ? `Added ${allData.length} new records to existing data`
+                  : `Loaded ${allData.length} records`,
+              });
+            }
+          }
+        } catch (error) {
+          toast({
+            title: 'Parse Error',
+            description: error instanceof Error ? error.message : `Failed to parse ${file.name}`,
+            variant: 'destructive',
+          });
+          processedCount++;
+        }
+      };
+      reader.readAsText(file);
+    });
+  }, [onDataLoaded, toast, hasExistingData]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files);
+    }
   }, [handleFile]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -70,8 +96,9 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
   }, []);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    if (e.target.files && e.target.files.length > 0) {
+      handleFile(e.target.files);
+    }
   }, [handleFile]);
 
   return (
@@ -92,6 +119,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
         <input
           type="file"
           accept=".csv"
+          multiple
           onChange={handleFileInput}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           id="file-upload"
@@ -116,7 +144,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
             <p className="text-sm text-muted-foreground">
               {hasExistingData 
                 ? 'New data will be added to existing records'
-                : 'Drag and drop or click to browse'}
+                : 'Drag and drop or click to browse (multiple files supported)'}
             </p>
           </div>
 
