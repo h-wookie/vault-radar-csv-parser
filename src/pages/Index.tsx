@@ -58,37 +58,50 @@ const Index = () => {
   const handleDataLoaded = (newData: CSVData) => {
     setCsvData(prevData => {
       if (prevData && prevData.length > 0) {
-        // Get existing fingerprints
-        const fingerprintCol = Object.keys(prevData[0]).find(col => 
+        // Find fingerprint columns in both datasets (case-insensitive)
+        const prevFpCol = Object.keys(prevData[0]).find(col =>
           col.toLowerCase().includes('fingerprint')
         );
-        
-        if (!fingerprintCol) {
-          // If no fingerprint column, just append
-          return [...prevData, ...newData];
-        }
-        
-        const existingFingerprints = new Set(
-          prevData.map(record => record[fingerprintCol]).filter(Boolean)
+        const newFpCol = Object.keys(newData[0] || {}).find(col =>
+          col.toLowerCase().includes('fingerprint')
         );
-        
-        // Filter out duplicates from new data
-        const uniqueNewData = newData.filter(record => {
-          const fingerprint = record[fingerprintCol];
-          return fingerprint && !existingFingerprints.has(fingerprint);
-        });
-        
-        const duplicateCount = newData.length - uniqueNewData.length;
-        
-        if (duplicateCount > 0) {
+
+        if (prevFpCol && newFpCol) {
+          const existingFingerprints = new Set(
+            prevData
+              .map(record => (record[prevFpCol] || '').toLowerCase())
+              .filter(Boolean)
+          );
+
+          // Filter out duplicates from new data using its own fingerprint column
+          const uniqueNewData = newData.filter(record => {
+            const fingerprint = (record[newFpCol] || '').toLowerCase();
+            return fingerprint && !existingFingerprints.has(fingerprint);
+          });
+
+          const duplicateCount = newData.length - uniqueNewData.length;
+
           toast({
-            title: 'Duplicates Removed',
+            title: 'Upload complete',
             description: `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates`,
           });
+
+          return uniqueNewData.length > 0 ? [...prevData, ...uniqueNewData] : prevData;
         }
-        
-        return [...prevData, ...uniqueNewData];
+
+        // No fingerprint in one or both datasets: append without de-duplication
+        toast({
+          title: 'Upload complete',
+          description: `Added ${newData.length} new records`,
+        });
+        return [...prevData, ...newData];
       }
+
+      // First load
+      toast({
+        title: 'Loaded data',
+        description: `Loaded ${newData.length} records`,
+      });
       return newData;
     });
   };
