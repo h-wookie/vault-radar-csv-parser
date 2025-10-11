@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { CSVData, CSVRecord } from '@/types/csvData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -68,23 +68,17 @@ export const DataTable = ({ data }: DataTableProps) => {
     return [categoryCol, descriptionCol, severityCol, pathCol, createdCol].filter(Boolean);
   }, [columns]);
 
-  const getSeverityColumn = () => 
-    columns.find(col => col.toLowerCase().includes('severity')) || '';
+  const getSeverityColumn = useCallback(() => 
+    columns.find(col => col.toLowerCase().includes('severity')) || '',
+    [columns]
+  );
 
-  const getCategoryColumn = () => 
-    columns.find(col => col.toLowerCase().includes('category')) || '';
+  const getCategoryColumn = useCallback(() => 
+    columns.find(col => col.toLowerCase().includes('category')) || '',
+    [columns]
+  );
 
-  const uniqueSeverities = useMemo(() => {
-    const sevCol = getSeverityColumn();
-    return sevCol ? Array.from(new Set(data.map(r => r[sevCol]).filter(Boolean))) : [];
-  }, [data, columns]);
-
-  const uniqueCategories = useMemo(() => {
-    const catCol = getCategoryColumn();
-    return catCol ? Array.from(new Set(data.map(r => r[catCol]).filter(Boolean))) : [];
-  }, [data, columns]);
-
-  const getSeverityOrder = (severity: string) => {
+  const getSeverityOrder = useCallback((severity: string) => {
     const lower = severity.toLowerCase();
     if (lower.includes('critical')) return 0;
     if (lower.includes('high')) return 1;
@@ -92,7 +86,17 @@ export const DataTable = ({ data }: DataTableProps) => {
     if (lower.includes('low')) return 3;
     if (lower.includes('info')) return 4;
     return 5;
-  };
+  }, []);
+
+  const uniqueSeverities = useMemo(() => {
+    const sevCol = getSeverityColumn();
+    return sevCol ? Array.from(new Set(data.map(r => r[sevCol]).filter(Boolean))) : [];
+  }, [data, getSeverityColumn]);
+
+  const uniqueCategories = useMemo(() => {
+    const catCol = getCategoryColumn();
+    return catCol ? Array.from(new Set(data.map(r => r[catCol]).filter(Boolean))) : [];
+  }, [data, getCategoryColumn]);
 
   const filteredAndSortedData = useMemo(() => {
     const sevCol = getSeverityColumn();
@@ -131,7 +135,7 @@ export const DataTable = ({ data }: DataTableProps) => {
     }
 
     return filtered;
-  }, [data, searchQuery, severityFilter, categoryFilter, sortField, sortDirection, columns]);
+  }, [data, searchQuery, severityFilter, categoryFilter, sortField, sortDirection, getSeverityColumn, getSeverityOrder]);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
