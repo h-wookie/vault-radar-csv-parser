@@ -9,6 +9,61 @@ export const exportToPDF = (data: CSVData) => {
   const pageHeight = doc.internal.pageSize.getHeight();
   let yPosition = 20;
 
+  // Create pie chart as image
+  const createPieChart = (severityCounts: Record<string, number>): string => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 300;
+    canvas.height = 300;
+    const ctx = canvas.getContext('2d')!;
+    
+    const colors: Record<string, string> = {
+      'critical': '#ef4444',
+      'high': '#f97316',
+      'medium': '#eab308',
+      'low': '#84cc16',
+      'info': '#22c55e',
+    };
+    
+    const total = Object.values(severityCounts).reduce((a, b) => a + b, 0);
+    let currentAngle = -Math.PI / 2; // Start at top
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 100;
+    
+    // Draw pie slices
+    Object.entries(severityCounts)
+      .sort(([, a], [, b]) => b - a)
+      .forEach(([severity, count]) => {
+        const sliceAngle = (count / total) * 2 * Math.PI;
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        
+        const color = colors[severity.toLowerCase()] || '#94a3b8';
+        ctx.fillStyle = color;
+        ctx.fill();
+        
+        // Add labels
+        const labelAngle = currentAngle + sliceAngle / 2;
+        const labelX = centerX + Math.cos(labelAngle) * (radius + 30);
+        const labelY = centerY + Math.sin(labelAngle) * (radius + 30);
+        
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(severity, labelX, labelY);
+        ctx.font = '12px Arial';
+        ctx.fillText(`(${count})`, labelX, labelY + 15);
+        
+        currentAngle += sliceAngle;
+      });
+    
+    return canvas.toDataURL('image/png');
+  };
+
   // Helper function to add page numbers
   const addPageNumber = (pageNum: number, totalPages: number) => {
     doc.setFontSize(8);
@@ -40,6 +95,7 @@ export const exportToPDF = (data: CSVData) => {
   doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPosition, { align: 'center' });
 
   // Overview Section
+  const overviewStartY = yPosition;
   yPosition += 12;
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
@@ -56,8 +112,8 @@ export const exportToPDF = (data: CSVData) => {
     col.toLowerCase().includes('severity')
   );
   
+  let severityCounts: Record<string, number> = {};
   if (severityCol) {
-    const severityCounts: Record<string, number> = {};
     data.forEach(record => {
       const severity = record[severityCol];
       if (severity) {
@@ -104,6 +160,12 @@ export const exportToPDF = (data: CSVData) => {
         doc.text(`  ${category}: ${count}`, 14, yPosition);
         yPosition += 4;
       });
+  }
+
+  // Add pie chart to the right of overview
+  if (Object.keys(severityCounts).length > 0) {
+    const chartImage = createPieChart(severityCounts);
+    doc.addImage(chartImage, 'PNG', pageWidth - 70, overviewStartY + 5, 55, 55);
   }
 
   // Data Table - display columns
