@@ -41,9 +41,16 @@ export const DataTable = ({ data }: DataTableProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [severityFilter, setSeverityFilter] = useState<string[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [selectedRecord, setSelectedRecord] = useState<CSVRecord | null>(null);
+  
+  // Set default sort to severity column
+  const defaultSeverityColumn = useMemo(() => 
+    data.length > 0 ? Object.keys(data[0]).find(col => col.toLowerCase().includes('severity')) || null : null,
+    [data]
+  );
+  
+  const [sortField, setSortField] = useState<SortField>(defaultSeverityColumn);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSeverityColumn ? 'desc' : null);
 
   const columns = useMemo(() => 
     data.length > 0 ? Object.keys(data[0]) : [],
@@ -96,9 +103,18 @@ export const DataTable = ({ data }: DataTableProps) => {
     });
 
     if (sortField && sortDirection) {
+      const sevCol = getSeverityColumn();
       filtered = [...filtered].sort((a, b) => {
         const aVal = a[sortField] || '';
         const bVal = b[sortField] || '';
+        
+        // Use severity-aware sorting if sorting by severity column
+        if (sortField === sevCol) {
+          const comparison = getSeverityOrder(aVal) - getSeverityOrder(bVal);
+          return sortDirection === 'asc' ? comparison : -comparison;
+        }
+        
+        // Default alphabetical sorting for other columns
         const comparison = aVal.localeCompare(bVal);
         return sortDirection === 'asc' ? comparison : -comparison;
       });
@@ -132,6 +148,16 @@ export const DataTable = ({ data }: DataTableProps) => {
     if (lower.includes('medium')) return 'secondary';
     if (lower.includes('low') || lower.includes('info')) return 'success';
     return 'secondary';
+  };
+
+  const getSeverityOrder = (severity: string) => {
+    const lower = severity.toLowerCase();
+    if (lower.includes('critical')) return 0;
+    if (lower.includes('high')) return 1;
+    if (lower.includes('medium')) return 2;
+    if (lower.includes('low')) return 3;
+    if (lower.includes('info')) return 4;
+    return 5;
   };
 
   const severityColumn = getSeverityColumn();
