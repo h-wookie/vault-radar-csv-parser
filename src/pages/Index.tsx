@@ -273,6 +273,18 @@ const Index = () => {
                       </a>
                     </Button>
                   </div>
+                  
+                  {/* Made with Lovable */}
+                  <div className="mt-auto pt-6 border-t">
+                    <a 
+                      href="https://lovable.dev" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Made with ❤️ using Lovable.dev
+                    </a>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
