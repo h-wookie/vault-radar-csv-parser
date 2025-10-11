@@ -179,14 +179,24 @@ const Index = () => {
             
             <div className="flex items-center gap-2">
               {csvData && (
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => fileInputRef.current?.click()}
-                  title="Upload More Data"
-                >
-                  <Upload className="w-5 h-5" />
-                </Button>
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="header-file-upload"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Upload More Data"
+                  >
+                    <Upload className="w-5 h-5" />
+                  </Button>
+                </>
               )}
               
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -212,14 +222,6 @@ const Index = () => {
                   {/* Upload More Button */}
                   {csvData && (
                     <>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".csv"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        id="header-file-upload"
-                      />
                       <Button 
                         variant="outline" 
                         className="w-full justify-start gap-2"
