@@ -116,41 +116,63 @@ const Index = () => {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    if (!file.name.endsWith('.csv')) {
+    // Validate all files are CSV
+    const nonCsvFiles = Array.from(files).filter(file => !file.name.endsWith('.csv'));
+    if (nonCsvFiles.length > 0) {
       toast({
-        title: 'Invalid File',
-        description: 'Please upload a CSV file',
+        title: 'Invalid File(s)',
+        description: `Please upload only CSV files. Found: ${nonCsvFiles.map(f => f.name).join(', ')}`,
         variant: 'destructive',
       });
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const text = event.target?.result as string;
-        const data = parseCSV(text);
-        
-        if (data.length === 0) {
-          throw new Error('No data found in CSV');
-        }
+    // Process all files
+    let processedCount = 0;
+    let allData: CSVData = [];
 
-        handleDataLoaded(data);
-        setIsMenuOpen(false);
-      } catch (error) {
-        toast({
-          title: 'Parse Error',
-          description: error instanceof Error ? error.message : 'Failed to parse CSV',
-          variant: 'destructive',
-        });
-      }
-    };
-    reader.readAsText(file);
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const text = event.target?.result as string;
+          const data = parseCSV(text);
+          
+          if (data.length === 0) {
+            throw new Error(`No data found in ${file.name}`);
+          }
+
+          allData = [...allData, ...data];
+          processedCount++;
+
+          // Once all files are processed, load the combined data
+          if (processedCount === files.length) {
+            handleDataLoaded(allData);
+            setIsMenuOpen(false);
+            
+            if (files.length > 1) {
+              toast({
+                title: 'Multiple Files Uploaded',
+                description: `Successfully processed ${files.length} CSV files`,
+              });
+            }
+          }
+        } catch (error) {
+          toast({
+            title: 'Parse Error',
+            description: error instanceof Error ? error.message : `Failed to parse ${file.name}`,
+            variant: 'destructive',
+          });
+          processedCount++;
+        }
+      };
+      reader.readAsText(file);
+    });
     
-    // Reset input so same file can be uploaded again
+    // Reset input so same files can be uploaded again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -184,6 +206,7 @@ const Index = () => {
                     ref={fileInputRef}
                     type="file"
                     accept=".csv"
+                    multiple
                     onChange={handleFileUpload}
                     className="hidden"
                     id="header-file-upload"
