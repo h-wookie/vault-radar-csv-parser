@@ -139,6 +139,7 @@ const Index = () => {
         }
 
         handleDataLoaded(data);
+        setIsMenuOpen(false);
       } catch (error) {
         toast({
           title: 'Parse Error',
@@ -212,7 +213,6 @@ const Index = () => {
                         className="w-full justify-start gap-2"
                         onClick={() => {
                           fileInputRef.current?.click();
-                          setIsMenuOpen(false);
                         }}
                       >
                         <Upload className="w-4 h-4" />
