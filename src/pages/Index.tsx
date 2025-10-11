@@ -401,6 +401,16 @@ const Index = () => {
                 </p>
               </div>
             </div>
+            
+            {/* Disclaimer */}
+            <div className="max-w-3xl mt-12 p-6 rounded-lg bg-muted/50 border">
+              <p className="text-sm text-muted-foreground leading-relaxed text-center">
+                <strong>Disclaimer:</strong> This project is a personal, community-driven tool and is not an official HashiCorp product. 
+                It is not affiliated with, endorsed by, or supported by HashiCorp. 
+                The software is provided "as is," without warranty of any kind, express or implied. 
+                Use at your own risk.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
