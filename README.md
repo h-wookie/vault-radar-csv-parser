@@ -4,7 +4,7 @@
 [![SBOM](https://img.shields.io/badge/SBOM-CycloneDX-blue)](./sbom/sbom.json)
 
 Vault-Radar CSV Parser is an offline, open-source tool designed to analyze Vault-Radar export files.
-It allows you to filter, inspect, and export secret data directly from CSV files, even when the SaaS solution is unavailable.
+It allows you to filter, inspect, and export secret data directly from CSV files generated in situations when you are unable to use the SaaS solution.
 
 Key features include:
 
