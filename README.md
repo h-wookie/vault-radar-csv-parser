@@ -84,6 +84,36 @@ Open your browser at [http://localhost:8080](http://localhost:8080) to use the a
 
 ---
 
+### Run with Nomad
+
+File: [example-nomad-jobspec.hcl](./example-nomad-jobspec.hcl)
+
+Run it with:
+
+```sh
+nomad job run example-nomad-jobspec.hcl
+```
+
+Then access it with your browser on <NOMAD_NODE_IP>:8080
+
+---
+
+### Run with Kubernetes
+
+File: [example-kubernetes-spec.yaml](./example-kubernetes-spec.yaml)
+
+Deploy with:
+
+```sh
+kubectl apply -f example-kubernetes-spec.yaml
+```
+
+Access it from inside the cluster via:
+
+```sh
+kubectl port-forward pod/vault-radar-csv-parser 8080:8080
+```
+
 ## Support
 
 Vault-Radar CSV Parser is community-supported.
