@@ -1,7 +1,9 @@
 # Vault-Radar CSV Parser
 
-[![Open Source](https://img.shields.io/badge/open%20source-yes-brightgreen)](https://github.com/Atnaszurc/vault-radar-csv-parser)
-[![SBOM](https://img.shields.io/badge/SBOM-CycloneDX-blue)](./sbom/sbom.json)
+[![Open Source](https://img.shields.io/badge/open%20source-yes-brightgreen?style=for-the-badge&logo=github)](https://github.com/Atnaszurc/vault-radar-csv-parser)
+[![SBOM](https://img.shields.io/badge/SBOM-CycloneDX-blue?style=for-the-badge&logo=dependabot)](./sbom/sbom.json)
+[![Docker Hub](https://img.shields.io/badge/DockerHub-vault--radar--csv-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/fwarfvinge/vault-radar-csv)
+
 
 Vault-Radar CSV Parser is an offline, open-source tool designed to analyze Vault-Radar export files.
 It allows you to filter, inspect, and export secret data directly from CSV files generated in situations when you are unable to use the SaaS solution.
