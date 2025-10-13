@@ -26,6 +26,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parseCSV } from '@/utils/csvParser';
 import { Separator } from '@/components/ui/separator';
+import { saveCSVData, loadCSVData, clearCSVData } from '@/utils/db';
 
 const STORAGE_KEY = 'vault-radar-csv-data';
 
@@ -35,25 +36,27 @@ const Index = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load data from sessionStorage on mount
+  // Load data from IndexedDB on mount
   useEffect(() => {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsedData = JSON.parse(stored);
-        setCsvData(parsedData);
-      } catch (error) {
-        console.error('Failed to load data from sessionStorage:', error);
+    loadCSVData(STORAGE_KEY).then(data => {
+      if (data) {
+        setCsvData(data);
       }
-    }
+    }).catch(error => {
+      console.error('Failed to load data from IndexedDB:', error);
+    });
   }, []);
 
-  // Save to sessionStorage whenever csvData changes
+  // Save to IndexedDB whenever csvData changes
   useEffect(() => {
     if (csvData) {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(csvData));
+      saveCSVData(STORAGE_KEY, csvData).catch(error => {
+        console.error('Failed to save data to IndexedDB:', error);
+      });
     } else {
-      sessionStorage.removeItem(STORAGE_KEY);
+      clearCSVData(STORAGE_KEY).catch(error => {
+        console.error('Failed to clear data from IndexedDB:', error);
+      });
     }
   }, [csvData]);
 
@@ -126,8 +129,8 @@ const Index = () => {
     });
   };
 
-  const handleClearStorage = () => {
-    sessionStorage.removeItem(STORAGE_KEY);
+  const handleClearStorage = async () => {
+    await clearCSVData(STORAGE_KEY);
     setCsvData(null);
     toast({
       title: 'Storage Cleared',
