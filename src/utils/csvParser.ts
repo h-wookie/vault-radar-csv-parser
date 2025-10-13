@@ -1,13 +1,11 @@
 import { CSVRecord, CSVData } from "@/types/csvData";
 
 export const parseCSV = (csvText: string): CSVData => {
-  // Normalize line endings and handle BOM
-  let normalizedText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-  
-  // Remove BOM if present (can cause issues in Chromium)
-  if (normalizedText.charCodeAt(0) === 0xFEFF) {
-    normalizedText = normalizedText.slice(1);
-  }
+  // Normalize line endings and handle BOM (hardened for Chromium)
+  let normalizedText = csvText
+    .replace(/^\uFEFF/, '')     // Remove BOM (even if charCode check fails)
+    .replace(/\r\n/g, '\n')     // Windows line endings
+    .replace(/\r/g, '\n');      // Old Mac line endings
   
   const lines = normalizedText.split('\n').filter(line => line.trim() !== '');
   

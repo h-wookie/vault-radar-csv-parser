@@ -61,7 +61,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           processedCount++;
         }
       };
-      reader.readAsText(file);
+      reader.readAsText(file, 'UTF-8');
     });
   }, [onDataLoaded, toast, hasExistingData]);
 

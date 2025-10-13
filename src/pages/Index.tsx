@@ -26,7 +26,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parseCSV } from '@/utils/csvParser';
 import { Separator } from '@/components/ui/separator';
-import { saveCSVData, loadCSVData, clearCSVData } from '@/utils/db';
+import { saveCSVData, loadCSVData, clearCSVData, saveOrMergeCSVData } from '@/utils/db';
 
 const STORAGE_KEY = 'vault-radar-csv-data';
 
