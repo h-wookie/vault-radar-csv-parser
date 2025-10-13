@@ -18,7 +18,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
   const handleFile = useCallback((files: FileList) => {
     // Validate all files are CSV
     const fileArray = Array.from(files);
-    const nonCsvFiles = fileArray.filter(file => !file.name.endsWith('.csv'));
+    const nonCsvFiles = fileArray.filter(file => !file.name.toLowerCase().endsWith('.csv'));
     
     if (nonCsvFiles.length > 0) {
       toast({
@@ -67,6 +67,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
@@ -76,10 +77,13 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
     setIsDragging(true);
   }, []);
 
-  const handleDragLeave = useCallback(() => {
+  const handleDragLeave = useCallback((e?: React.DragEvent) => {
+    e?.stopPropagation();
     setIsDragging(false);
   }, []);
 
@@ -104,12 +108,13 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           }
         `}
       >
-        <input ref={inputRef}
+        <input
+          ref={inputRef}
           type="file"
-          accept=".csv"
+          accept=".csv,text/csv"
           multiple
           onChange={handleFileInput}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          className="sr-only"
           id="file-upload"
         />
         

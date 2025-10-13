@@ -141,7 +141,7 @@ const Index = () => {
     e.target.value = '';
 
     // Validate all files are CSV
-    const nonCsvFiles = Array.from(files).filter(file => !file.name.endsWith('.csv'));
+    const nonCsvFiles = Array.from(files).filter(file => !file.name.toLowerCase().endsWith('.csv'));
     if (nonCsvFiles.length > 0) {
       toast({
         title: 'Invalid File(s)',
@@ -214,7 +214,7 @@ const Index = () => {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".csv"
+                    accept=".csv,text/csv"
                     multiple
                     onChange={handleFileUpload}
                     className="hidden"
