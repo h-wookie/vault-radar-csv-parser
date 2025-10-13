@@ -35,23 +35,25 @@ const Index = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load data from localStorage on mount
+  // Load data from sessionStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = sessionStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         const parsedData = JSON.parse(stored);
         setCsvData(parsedData);
       } catch (error) {
-        console.error('Failed to load data from localStorage:', error);
+        console.error('Failed to load data from sessionStorage:', error);
       }
     }
   }, []);
 
-  // Save to localStorage whenever csvData changes
+  // Save to sessionStorage whenever csvData changes
   useEffect(() => {
     if (csvData) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(csvData));
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(csvData));
+    } else {
+      sessionStorage.removeItem(STORAGE_KEY);
     }
   }, [csvData]);
 
@@ -125,7 +127,7 @@ const Index = () => {
   };
 
   const handleClearStorage = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
     setCsvData(null);
     toast({
       title: 'Storage Cleared',
