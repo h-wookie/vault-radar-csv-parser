@@ -1,7 +1,15 @@
 import { CSVRecord, CSVData } from "@/types/csvData";
 
 export const parseCSV = (csvText: string): CSVData => {
-  const lines = csvText.split('\n').filter(line => line.trim() !== '');
+  // Normalize line endings and handle BOM
+  let normalizedText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  
+  // Remove BOM if present (can cause issues in Chromium)
+  if (normalizedText.charCodeAt(0) === 0xFEFF) {
+    normalizedText = normalizedText.slice(1);
+  }
+  
+  const lines = normalizedText.split('\n').filter(line => line.trim() !== '');
   
   if (lines.length === 0) {
     throw new Error('CSV file is empty');
@@ -48,15 +56,16 @@ const parseCSVLine = (line: string): string[] => {
         inQuotes = !inQuotes;
       }
     } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
+      result.push(current);
       current = '';
     } else {
       current += char;
     }
   }
 
-  result.push(current.trim());
-  return result;
+  // Push final field (even if empty)
+  result.push(current);
+  return result.map(field => field.trim());
 };
 
 export const exportToCSV = (data: CSVData, filename: string = 'export.csv') => {
