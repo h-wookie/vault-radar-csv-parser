@@ -137,6 +137,9 @@ const Index = () => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    // Reset input immediately to allow re-uploading
+    e.target.value = '';
+
     // Validate all files are CSV
     const nonCsvFiles = Array.from(files).filter(file => !file.name.endsWith('.csv'));
     if (nonCsvFiles.length > 0) {
@@ -182,11 +185,6 @@ const Index = () => {
       };
       reader.readAsText(file);
     });
-    
-    // Reset input so same files can be uploaded again
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
   };
 
 

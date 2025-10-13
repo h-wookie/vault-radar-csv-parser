@@ -84,6 +84,8 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       handleFile(e.target.files);
+      // Reset input value to allow re-uploading the same file
+      e.target.value = '';
     }
   }, [handleFile]);
 
