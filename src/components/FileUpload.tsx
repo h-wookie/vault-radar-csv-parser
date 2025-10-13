@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { Upload, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +13,7 @@ interface FileUploadProps {
 export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback((files: FileList) => {
     // Validate all files are CSV
@@ -49,6 +50,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           // Once all files are processed, load the combined data
           if (processedCount === files.length) {
             onDataLoaded(allData);
+            if (inputRef.current) inputRef.current.value = '';
           }
         } catch (error) {
           toast({
@@ -84,8 +86,6 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       handleFile(e.target.files);
-      // Reset input value to allow re-uploading the same file
-      e.target.value = '';
     }
   }, [handleFile]);
 
@@ -104,7 +104,7 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           }
         `}
       >
-        <input
+        <input ref={inputRef}
           type="file"
           accept=".csv"
           multiple
