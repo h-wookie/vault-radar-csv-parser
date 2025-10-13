@@ -60,10 +60,7 @@ const Index = () => {
   }, [csvData]);
 
   const handleDataLoaded = (newData: CSVData) => {
-    console.log('[handleDataLoaded] New data count:', newData.length);
-    
     setCsvData(prevData => {
-      console.log('[handleDataLoaded] Existing data count:', prevData?.length || 0);
       
       if (prevData && prevData.length > 0) {
         // Find fingerprint columns in both datasets (case-insensitive)
@@ -80,7 +77,6 @@ const Index = () => {
               .map(record => (record[prevFpCol] || '').toLowerCase())
               .filter(Boolean)
           );
-          console.log('[handleDataLoaded] Existing fingerprints:', existingFingerprints.size);
 
           // Dedupe against existing data AND within the newly uploaded set
           const seenNew = new Set<string>();
@@ -104,9 +100,6 @@ const Index = () => {
           }
 
           const duplicateCount = duplicatesVsExisting + duplicatesWithinUploads;
-          console.log('[handleDataLoaded] Duplicates vs existing:', duplicatesVsExisting);
-          console.log('[handleDataLoaded] Duplicates within uploads:', duplicatesWithinUploads);
-          console.log('[handleDataLoaded] Unique new records:', uniqueNewData.length);
 
           toast({
             title: 'Upload complete',
@@ -117,7 +110,6 @@ const Index = () => {
           });
 
           const finalData = uniqueNewData.length > 0 ? [...prevData, ...uniqueNewData] : prevData;
-          console.log('[handleDataLoaded] Final merged total:', finalData.length);
           return finalData;
         }
 
@@ -127,7 +119,6 @@ const Index = () => {
           description: `Added ${newData.length} new records`,
         });
         const finalData = [...prevData, ...newData];
-        console.log('[handleDataLoaded] Final merged total (no dedup):', finalData.length);
         return finalData;
       }
 
@@ -136,7 +127,6 @@ const Index = () => {
         title: 'Loaded data',
         description: `Loaded ${newData.length} records`,
       });
-      console.log('[handleDataLoaded] First load, total:', newData.length);
       return newData;
     });
   };
