@@ -24,17 +24,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { parseCSV } from '@/utils/csvParser';
 import { Separator } from '@/components/ui/separator';
-import { saveCSVData, loadCSVData, clearCSVData, saveOrMergeCSVData } from '@/utils/db';
+import { saveCSVData, loadCSVData, clearCSVData } from '@/utils/db';
 
 const STORAGE_KEY = 'vault-radar-csv-data';
 
 const Index = () => {
   const [csvData, setCsvData] = useState<CSVData | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load data from IndexedDB on mount
   useEffect(() => {
@@ -61,7 +60,11 @@ const Index = () => {
   }, [csvData]);
 
   const handleDataLoaded = (newData: CSVData) => {
+    console.log('[handleDataLoaded] New data count:', newData.length);
+    
     setCsvData(prevData => {
+      console.log('[handleDataLoaded] Existing data count:', prevData?.length || 0);
+      
       if (prevData && prevData.length > 0) {
         // Find fingerprint columns in both datasets (case-insensitive)
         const prevFpCol = Object.keys(prevData[0]).find(col =>
@@ -77,6 +80,7 @@ const Index = () => {
               .map(record => (record[prevFpCol] || '').toLowerCase())
               .filter(Boolean)
           );
+          console.log('[handleDataLoaded] Existing fingerprints:', existingFingerprints.size);
 
           // Dedupe against existing data AND within the newly uploaded set
           const seenNew = new Set<string>();
@@ -100,6 +104,9 @@ const Index = () => {
           }
 
           const duplicateCount = duplicatesVsExisting + duplicatesWithinUploads;
+          console.log('[handleDataLoaded] Duplicates vs existing:', duplicatesVsExisting);
+          console.log('[handleDataLoaded] Duplicates within uploads:', duplicatesWithinUploads);
+          console.log('[handleDataLoaded] Unique new records:', uniqueNewData.length);
 
           toast({
             title: 'Upload complete',
@@ -109,7 +116,9 @@ const Index = () => {
                 : `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates`,
           });
 
-          return uniqueNewData.length > 0 ? [...prevData, ...uniqueNewData] : prevData;
+          const finalData = uniqueNewData.length > 0 ? [...prevData, ...uniqueNewData] : prevData;
+          console.log('[handleDataLoaded] Final merged total:', finalData.length);
+          return finalData;
         }
 
         // No fingerprint in one or both datasets: append without de-duplication
@@ -117,7 +126,9 @@ const Index = () => {
           title: 'Upload complete',
           description: `Added ${newData.length} new records`,
         });
-        return [...prevData, ...newData];
+        const finalData = [...prevData, ...newData];
+        console.log('[handleDataLoaded] Final merged total (no dedup):', finalData.length);
+        return finalData;
       }
 
       // First load
@@ -125,6 +136,7 @@ const Index = () => {
         title: 'Loaded data',
         description: `Loaded ${newData.length} records`,
       });
+      console.log('[handleDataLoaded] First load, total:', newData.length);
       return newData;
     });
   };
@@ -138,58 +150,10 @@ const Index = () => {
     });
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    // Reset input immediately to allow re-uploading
-    e.target.value = '';
-
-    // Validate all files are CSV
-    const nonCsvFiles = Array.from(files).filter(file => !file.name.toLowerCase().endsWith('.csv'));
-    if (nonCsvFiles.length > 0) {
-      toast({
-        title: 'Invalid File(s)',
-        description: `Please upload only CSV files. Found: ${nonCsvFiles.map(f => f.name).join(', ')}`,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Process all files
-    let processedCount = 0;
-    let allData: CSVData = [];
-
-    Array.from(files).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const text = event.target?.result as string;
-          const data = parseCSV(text);
-          
-          if (data.length === 0) {
-            throw new Error(`No data found in ${file.name}`);
-          }
-
-          allData = [...allData, ...data];
-          processedCount++;
-
-          // Once all files are processed, load the combined data
-          if (processedCount === files.length) {
-            handleDataLoaded(allData);
-            setIsMenuOpen(false);
-          }
-        } catch (error) {
-          toast({
-            title: 'Parse Error',
-            description: error instanceof Error ? error.message : `Failed to parse ${file.name}`,
-            variant: 'destructive',
-          });
-          processedCount++;
-        }
-      };
-      reader.readAsText(file);
-    });
+  const handleUploadComplete = (newData: CSVData) => {
+    handleDataLoaded(newData);
+    setIsUploadDialogOpen(false);
+    setIsMenuOpen(false);
   };
 
 
@@ -215,25 +179,25 @@ const Index = () => {
             
             <div className="flex items-center gap-2">
               {csvData && (
-                <>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".csv,text/csv"
-                    multiple
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="header-file-upload"
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload More Data"
-                  >
-                    <Upload className="w-5 h-5" />
-                  </Button>
-                </>
+                <Sheet open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      title="Upload More Data"
+                    >
+                      <Upload className="w-5 h-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="top" className="h-auto">
+                    <SheetHeader>
+                      <SheetTitle>Upload More Data</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <FileUpload onDataLoaded={handleUploadComplete} hasExistingData={!!csvData} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
               )}
               
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -263,7 +227,8 @@ const Index = () => {
                         variant="outline" 
                         className="w-full justify-start gap-2"
                         onClick={() => {
-                          fileInputRef.current?.click();
+                          setIsUploadDialogOpen(true);
+                          setIsMenuOpen(false);
                         }}
                       >
                         <Upload className="w-4 h-4" />

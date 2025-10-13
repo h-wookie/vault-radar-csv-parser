@@ -1,6 +1,9 @@
 import { CSVRecord, CSVData } from "@/types/csvData";
 
 export const parseCSV = (csvText: string): CSVData => {
+  console.log('[parseCSV] Input length:', csvText.length);
+  console.log('[parseCSV] Last 200 chars:', csvText.slice(-200));
+  
   // Normalize line endings and handle BOM (hardened for Chromium)
   let normalizedText = csvText
     .replace(/^\uFEFF/, '')     // Remove BOM (even if charCode check fails)
@@ -8,6 +11,7 @@ export const parseCSV = (csvText: string): CSVData => {
     .replace(/\r/g, '\n');      // Old Mac line endings
   
   const lines = normalizedText.split('\n').filter(line => line.trim() !== '');
+  console.log('[parseCSV] Line count after split:', lines.length);
   
   if (lines.length === 0) {
     throw new Error('CSV file is empty');
@@ -33,6 +37,7 @@ export const parseCSV = (csvText: string): CSVData => {
     records.push(record);
   }
 
+  console.log('[parseCSV] Final record count:', records.length);
   return records;
 };
 

@@ -22,11 +22,13 @@ export class AppDatabase extends Dexie {
 export const db = new AppDatabase();
 
 export const saveCSVData = async (key: string, data: CSVData) => {
+  console.log('[saveCSVData] Saving record count:', data.length);
   await db.csvData.put({
     key,
     data,
     timestamp: Date.now()
   });
+  console.log('[saveCSVData] Save completed successfully');
 };
 
 export const saveOrMergeCSVData = async (key: string, newData: CSVData) => {
