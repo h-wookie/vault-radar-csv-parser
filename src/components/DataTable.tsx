@@ -179,7 +179,7 @@ export const DataTable = ({ data }: DataTableProps) => {
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search across all fields..."
+              placeholder="필드 전체 검색 (Search across all fields)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -190,8 +190,8 @@ export const DataTable = ({ data }: DataTableProps) => {
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full lg:w-[200px] justify-between">
                 {severityFilter.length > 0 
-                  ? `${severityFilter.length} selected` 
-                  : 'Filter by Severity'}
+                  ? `${severityFilter.length}개 선택됨` 
+                  : 'Severity(심각도) 필터'}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -225,7 +225,7 @@ export const DataTable = ({ data }: DataTableProps) => {
                     className="w-full mt-2"
                     onClick={() => setSeverityFilter([])}
                   >
-                    Clear
+                    초기화
                   </Button>
                 )}
               </div>
@@ -236,8 +236,8 @@ export const DataTable = ({ data }: DataTableProps) => {
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full lg:w-[200px] justify-between">
                 {categoryFilter.length > 0 
-                  ? `${categoryFilter.length} selected` 
-                  : 'Filter by Category'}
+                  ? `${categoryFilter.length}개 선택됨` 
+                  : 'Category(카테고리) 필터'}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -271,7 +271,7 @@ export const DataTable = ({ data }: DataTableProps) => {
                     className="w-full mt-2"
                     onClick={() => setCategoryFilter([])}
                   >
-                    Clear
+                    초기화
                   </Button>
                 )}
               </div>
@@ -284,12 +284,12 @@ export const DataTable = ({ data }: DataTableProps) => {
             className="gap-2"
           >
             <FileDown className="w-4 h-4" />
-            Export PDF
+            PDF 내보내기
           </Button>
         </div>
 
         <div className="mt-4 text-sm text-muted-foreground">
-          Showing {filteredAndSortedData.length} of {data.length} records
+          총 {data.length}건 중 {filteredAndSortedData.length}건 표시
         </div>
       </Card>
 
@@ -387,7 +387,7 @@ export const DataTable = ({ data }: DataTableProps) => {
 
       {filteredAndSortedData.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          No records found matching your filters
+          필터와 일치하는 결과가 없습니다.
         </div>
       )}
 
@@ -395,7 +395,7 @@ export const DataTable = ({ data }: DataTableProps) => {
       <Dialog open={!!selectedRecord} onOpenChange={() => setSelectedRecord(null)}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Finding Details</DialogTitle>
+            <DialogTitle>검출 상세 (Finding Details)</DialogTitle>
           </DialogHeader>
           {selectedRecord && (
             <div className="space-y-4">

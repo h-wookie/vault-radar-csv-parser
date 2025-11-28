@@ -42,7 +42,7 @@ export const SeverityChart = ({ data, severityColumn }: SeverityChartProps) => {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Severity Distribution</h3>
+      <h3 className="text-lg font-semibold mb-4">Severity 분포</h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
@@ -64,7 +64,7 @@ export const SeverityChart = ({ data, severityColumn }: SeverityChartProps) => {
         </PieChart>
       </ResponsiveContainer>
       <div className="mt-4 text-sm text-muted-foreground text-center">
-        Total records: {data.length}
+        총 건수: {data.length}
       </div>
     </Card>
   );

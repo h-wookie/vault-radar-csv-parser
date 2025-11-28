@@ -102,11 +102,11 @@ const Index = () => {
           const duplicateCount = duplicatesVsExisting + duplicatesWithinUploads;
 
           toast({
-            title: 'Upload complete',
+            title: '업로드 완료',
             description:
               duplicatesWithinUploads > 0
-                ? `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates (${duplicatesWithinUploads} within uploads)`
-                : `Added ${uniqueNewData.length} new records, skipped ${duplicateCount} duplicates`,
+                ? `${uniqueNewData.length}건 추가, 중복 ${duplicateCount}건 건너뜀 (업로드 내 중복 ${duplicatesWithinUploads}건 포함)`
+                : `${uniqueNewData.length}건 추가, 중복 ${duplicateCount}건 건너뜀`,
           });
 
           const finalData = uniqueNewData.length > 0 ? [...prevData, ...uniqueNewData] : prevData;
@@ -115,8 +115,8 @@ const Index = () => {
 
         // No fingerprint in one or both datasets: append without de-duplication
         toast({
-          title: 'Upload complete',
-          description: `Added ${newData.length} new records`,
+          title: '업로드 완료',
+          description: `${newData.length}건을 추가했습니다.`,
         });
         const finalData = [...prevData, ...newData];
         return finalData;
@@ -124,8 +124,8 @@ const Index = () => {
 
       // First load
       toast({
-        title: 'Loaded data',
-        description: `Loaded ${newData.length} records`,
+        title: '데이터 불러옴',
+        description: `${newData.length}건을 불러왔습니다.`,
       });
       return newData;
     });
@@ -135,8 +135,8 @@ const Index = () => {
     await clearCSVData(STORAGE_KEY);
     setCsvData(null);
     toast({
-      title: 'Storage Cleared',
-      description: 'All CSV data has been removed',
+      title: '저장소 삭제 완료',
+      description: '업로드한 CSV 데이터가 모두 삭제되었습니다.',
     });
   };
 
@@ -159,10 +159,10 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Vault Radar CSV Data Analyzer
+                  Vault Radar CSV 데이터 분석기
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Analyze CSV data with visual insights
+                  Vault Radar CSV 결과를 시각적으로 분석하고 정리하세요
                 </p>
               </div>
             </div>
@@ -174,14 +174,14 @@ const Index = () => {
                     <Button 
                       variant="outline" 
                       size="icon"
-                      title="Upload More Data"
+                      title="데이터 추가 업로드"
                     >
                       <Upload className="w-5 h-5" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="top" className="h-auto">
                     <SheetHeader>
-                      <SheetTitle>Upload More Data</SheetTitle>
+                      <SheetTitle>데이터 추가 업로드</SheetTitle>
                     </SheetHeader>
                     <div className="mt-6">
                       <FileUpload onDataLoaded={handleUploadComplete} hasExistingData={!!csvData} />
@@ -198,13 +198,13 @@ const Index = () => {
               </SheetTrigger>
               <SheetContent>
                 <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
+                  <SheetTitle>메뉴</SheetTitle>
                 </SheetHeader>
                 
                 <div className="flex flex-col gap-4 mt-6">
                   {/* Theme Toggle */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Theme</span>
+                    <span className="text-sm font-medium">테마</span>
                     <ThemeToggle />
                   </div>
                   
@@ -222,31 +222,31 @@ const Index = () => {
                         }}
                       >
                         <Upload className="w-4 h-4" />
-                        Upload More Data
+                        데이터 추가 업로드
                       </Button>
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="destructive" className="w-full justify-start gap-2">
                             <Trash2 className="w-4 h-4" />
-                            Clear Storage
+                            저장소 비우기
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
+                            <AlertDialogTitle>모든 데이터를 삭제할까요?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will permanently delete all uploaded CSV data from storage. 
-                              This action cannot be undone.
+                              업로드한 CSV 데이터를 전부 삭제합니다. 
+                              되돌릴 수 없습니다.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>취소</AlertDialogCancel>
                             <AlertDialogAction onClick={() => {
                               handleClearStorage();
                               setIsMenuOpen(false);
                             }}>
-                              Clear Data
+                              삭제
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -258,7 +258,7 @@ const Index = () => {
                   
                   {/* External Links */}
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Resources</p>
+                    <p className="text-sm font-medium text-muted-foreground">자료 / 링크</p>
                     
                     {/* Vault Radar Documentation */}
                     <Button 
@@ -272,7 +272,7 @@ const Index = () => {
                         rel="noopener noreferrer"
                       >
                         <BookOpen className="w-4 h-4" />
-                        What is Vault Radar?
+                        What is Vault Radar? (공식 문서)
                         <ExternalLink className="w-3 h-3 ml-auto" />
                       </a>
                     </Button>
@@ -288,7 +288,7 @@ const Index = () => {
                         rel="noopener noreferrer"
                       >
                         <BookOpen className="w-4 h-4" />
-                        Vault Radar CLI
+                        Vault Radar CLI (공식 문서)
                         <ExternalLink className="w-3 h-3 ml-auto" />
                       </a>
                     </Button>
@@ -304,7 +304,7 @@ const Index = () => {
                         rel="noopener noreferrer"
                       >
                         <BookOpen className="w-4 h-4" />
-                        Vault Radar Scan
+                        Vault Radar Scan (Repo 스캔 가이드)
                         <ExternalLink className="w-3 h-3 ml-auto" />
                       </a>
                     </Button>
@@ -319,13 +319,13 @@ const Index = () => {
                       <a 
                         href="https://github.com/Atnaszurc/vault-radar-csv-parser" 
                         target="_blank" 
-                        rel="noopener noreferrer"
-                      >
-                        <Github className="w-4 h-4" />
-                        GitHub Repository
-                        <ExternalLink className="w-3 h-3 ml-auto" />
-                      </a>
-                    </Button>
+                      rel="noopener noreferrer"
+                    >
+                      <Github className="w-4 h-4" />
+                      GitHub 저장소
+                      <ExternalLink className="w-3 h-3 ml-auto" />
+                    </a>
+                  </Button>
                     
                     <Button 
                       variant="outline" 
@@ -335,22 +335,21 @@ const Index = () => {
                       <a 
                         href="https://hub.docker.com/r/fwarfvinge/vault-radar-csv" 
                         target="_blank" 
-                        rel="noopener noreferrer"
-                      >
-                        <Database className="w-4 h-4" />
-                        Docker Hub
-                        <ExternalLink className="w-3 h-3 ml-auto" />
-                      </a>
-                    </Button>
-                  </div>
+                      rel="noopener noreferrer"
+                    >
+                      <Database className="w-4 h-4" />
+                      Docker Hub 이미지
+                      <ExternalLink className="w-3 h-3 ml-auto" />
+                    </a>
+                  </Button>
+                </div>
                   
                   {/* Disclaimer */}
                   <div className="mt-6 pt-4 border-t">
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      <strong>Disclaimer:</strong> This project is a personal, community-driven tool and is not an official HashiCorp product. 
-                      It is not affiliated with, endorsed by, or supported by HashiCorp. 
-                      The software is provided "as is," without warranty of any kind, express or implied. 
-                      Use at your own risk.
+                      <strong>Disclaimer:</strong> 커뮤니티가 유지하는 개인 프로젝트이며 HashiCorp 공식 제품이 아닙니다. 
+                      HashiCorp의 제휴/승인/지원이 없으며, 소프트웨어는 "있는 그대로(as is)" 제공됩니다. 
+                      사용에 따른 책임은 사용자에게 있습니다.
                     </p>
                   </div>
                   
@@ -379,11 +378,10 @@ const Index = () => {
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-8">
             <div className="text-center max-w-2xl">
               <h2 className="text-3xl font-bold mb-4">
-                Welcome to Vault Radar CSV Data Analyzer
+                Vault Radar CSV 데이터를 불러와 분석하세요
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Upload your CSV file to get started. View your data with interactive charts,
-                searchable tables, and advanced filtering capabilities.
+                Vault Radar export CSV를 업로드하고 대화형 차트, 검색 가능한 테이블, 고급 필터로 빠르게 살펴보세요.
               </p>
             </div>
             
@@ -395,9 +393,9 @@ const Index = () => {
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">Smart Search</h3>
+                <h3 className="font-semibold mb-2">스마트 검색</h3>
                 <p className="text-sm text-muted-foreground">
-                  Search across all fields with real-time filtering
+                  모든 필드를 대상으로 실시간 검색/필터링
                 </p>
               </div>
 
@@ -405,9 +403,9 @@ const Index = () => {
                 <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Filter className="w-6 h-6 text-accent" />
                 </div>
-                <h3 className="font-semibold mb-2">Advanced Filters</h3>
+                <h3 className="font-semibold mb-2">고급 필터</h3>
                 <p className="text-sm text-muted-foreground">
-                  Filter by severity, category, and more
+                  Severity, Category 등으로 정밀 필터링
                 </p>
               </div>
 
@@ -415,9 +413,9 @@ const Index = () => {
                 <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Database className="w-6 h-6 text-success" />
                 </div>
-                <h3 className="font-semibold mb-2">Visual Insights</h3>
+                <h3 className="font-semibold mb-2">시각적 인사이트</h3>
                 <p className="text-sm text-muted-foreground">
-                  Interactive charts for severity distribution
+                  Severity 분포를 차트로 한눈에 확인
                 </p>
               </div>
             </div>
@@ -425,10 +423,9 @@ const Index = () => {
             {/* Disclaimer */}
             <div className="max-w-3xl mt-12 p-6 rounded-lg bg-muted/50 border">
               <p className="text-sm text-muted-foreground leading-relaxed text-center">
-                <strong>Disclaimer:</strong> This project is a personal, community-driven tool and is not an official HashiCorp product. 
-                It is not affiliated with, endorsed by, or supported by HashiCorp. 
-                The software is provided "as is," without warranty of any kind, express or implied. 
-                Use at your own risk.
+                <strong>Disclaimer:</strong> 커뮤니티가 유지하는 개인 프로젝트이며 HashiCorp 공식 제품이 아닙니다. 
+                HashiCorp의 제휴/승인/지원이 없으며, 소프트웨어는 "있는 그대로(as is)" 제공됩니다. 
+                사용에 따른 책임은 사용자에게 있습니다.
               </p>
             </div>
           </div>

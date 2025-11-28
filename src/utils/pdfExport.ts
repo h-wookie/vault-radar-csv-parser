@@ -70,7 +70,7 @@ export const exportToPDF = (data: CSVData) => {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
     doc.text(
-      `Page ${pageNum} of ${totalPages}`,
+      `페이지 ${pageNum} / ${totalPages}`,
       pageWidth / 2,
       pageHeight - 10,
       { align: 'center' }
@@ -87,24 +87,24 @@ export const exportToPDF = (data: CSVData) => {
   // PAGE 1: Title & Overview with Data Table
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('Vault Radar Security Report', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('Vault Radar Security Report (보안 리포트)', pageWidth / 2, yPosition, { align: 'center' });
   
   yPosition += 8;
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPosition, { align: 'center' });
+  doc.text(`생성 시각: ${new Date().toLocaleString()}`, pageWidth / 2, yPosition, { align: 'center' });
 
   // Overview Section
   const overviewStartY = yPosition;
   yPosition += 12;
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('Overview', 14, yPosition);
+  doc.text('개요 (Overview)', 14, yPosition);
 
   yPosition += 6;
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Total Findings: ${data.length}`, 14, yPosition);
+  doc.text(`총 Finding 수: ${data.length}`, 14, yPosition);
 
   // Severity breakdown
   yPosition += 6;
@@ -122,7 +122,7 @@ export const exportToPDF = (data: CSVData) => {
     });
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Severity Distribution:', 14, yPosition);
+    doc.text('Severity 분포:', 14, yPosition);
     yPosition += 5;
     doc.setFont('helvetica', 'normal');
 
@@ -150,7 +150,7 @@ export const exportToPDF = (data: CSVData) => {
     });
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Category Distribution:', 14, yPosition);
+    doc.text('Category 분포:', 14, yPosition);
     yPosition += 5;
     doc.setFont('helvetica', 'normal');
 
@@ -208,7 +208,7 @@ export const exportToPDF = (data: CSVData) => {
   addNewPage();
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Field Descriptions', 14, yPosition);
+  doc.text('필드 설명 (Field Descriptions)', 14, yPosition);
 
   yPosition += 10;
   doc.setFontSize(8);
@@ -243,7 +243,7 @@ export const exportToPDF = (data: CSVData) => {
     // Page header
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Finding #${index + 1} of ${data.length}`, 14, yPosition);
+    doc.text(`Finding #${index + 1} / ${data.length}`, 14, yPosition);
 
     yPosition += 10;
 

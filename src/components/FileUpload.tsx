@@ -22,8 +22,8 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
     
     if (nonCsvFiles.length > 0) {
       toast({
-        title: 'Invalid File(s)',
-        description: `Please upload only CSV files. Found: ${nonCsvFiles.map(f => f.name).join(', ')}`,
+        title: 'CSV 파일만 업로드하세요',
+        description: `다음 파일은 CSV가 아닙니다: ${nonCsvFiles.map(f => f.name).join(', ')}`,
         variant: 'destructive',
       });
       return;
@@ -54,8 +54,8 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           }
         } catch (error) {
           toast({
-            title: 'Parse Error',
-            description: error instanceof Error ? error.message : `Failed to parse ${file.name}`,
+            title: 'CSV 파싱 오류',
+            description: error instanceof Error ? error.message : `${file.name} 파싱에 실패했습니다.`,
             variant: 'destructive',
           });
           processedCount++;
@@ -132,18 +132,18 @@ export const FileUpload = ({ onDataLoaded, hasExistingData = false }: FileUpload
           
           <div>
             <p className="text-lg font-semibold text-foreground mb-2">
-              {isDragging ? 'Drop your CSV file here' : hasExistingData ? 'Add More Data' : 'Upload CSV File'}
+              {isDragging ? '여기에 CSV 파일을 놓으세요' : hasExistingData ? '데이터 추가 업로드' : 'CSV 파일 업로드'}
             </p>
             <p className="text-sm text-muted-foreground">
               {hasExistingData 
-                ? 'New data will be added to existing records'
-                : 'Drag and drop or click to browse (multiple files supported)'}
+                ? '새 데이터가 기존 기록에 추가됩니다.'
+                : '끌어다 놓거나 클릭해서 선택하세요 (다중 파일 지원)'}
             </p>
           </div>
 
           <Button variant="outline" size="lg" className="mt-2" asChild>
             <label htmlFor="file-upload" className="cursor-pointer">
-              Choose File
+              파일 선택
             </label>
           </Button>
         </div>
